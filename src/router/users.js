@@ -1,17 +1,19 @@
 const express = require('express')
 const User = require('../models/user')
+const auth = require('../middleware/auth')
 
 const router = new express.Router()
 
-router.get('/user/:userName',async (req,res) => {
+router.get('/user/:userName',auth,async (req,res) => {
     try{
         const user  = await User.findOne({userName:req.params.userName})
         if(!user){
             res.status(400).send('user name not available!')
         }
-        res.status(200).send(user)
+        res.status(200).send({userName: user.userName,
+        email: user.email})
     }catch(e){
-        res.status(500).send(e)
+        res.status(503).send({errorMsg: e.message})
     }
 })
 
@@ -19,22 +21,21 @@ router.post('/user',async(req,res) => {
     try{
         const user = new User(req.body)
         await user.save()
-        res.status(200).send(user)
+        const token = await user.generateToken()
+        res.status(200).send({userName: user.userName, token})
     }catch(e){
-        res.status(503).send(e)
+        res.status(503).send({errorMsg: e.message})
     }
 
 })
 router.post('/user/login',async(req,res) => {
     try{
         const user = await User.findUserByCreds(req.body.userName,req.body.passwd)
-        if(!user){
-            res.status(401).send("Wrong credentials !!!")
-        }
-        res.status(200).send("Authenticated ....")
+        const token  = await user.generateToken()
+        res.status(200).send({userName: user.userName, token})
     }catch(e){
         console.log(e)
-        res.status(401).send('Wrong creds')
+        res.status(401).send({errorMsg: e.message})
     }
 
 })
