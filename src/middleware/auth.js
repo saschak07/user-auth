@@ -8,9 +8,8 @@ const auth  = async (req, res, next) => {
      throw new Error('Token required!!')
     }
  const decoded = jwt.verify(token.replace('Bearer ',''),'hare krishna')
- console.log(decoded)
  const user = await User.findOne({userName: decoded._id})
- console.log(user)
+ console.log('logged in user:'+user.userName)
  if(!user){
      throw new Error('Wrong token!!')
  }

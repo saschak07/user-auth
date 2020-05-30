@@ -4,9 +4,9 @@ const auth = require('../middleware/auth')
 
 const router = new express.Router()
 
-router.get('/user/:userName',auth,async (req,res) => {
+router.get('/user/me',auth,async (req,res) => {
     try{
-        const user  = await User.findOne({userName:req.params.userName})
+        const user  = req.user;
         if(!user){
             res.status(400).send('user name not available!')
         }
