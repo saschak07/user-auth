@@ -6,12 +6,8 @@ const router = new express.Router()
 
 router.get('/user/me',auth,async (req,res) => {
     try{
-        const user  = req.user;
-        if(!user){
-            res.status(400).send('user name not available!')
-        }
-        res.status(200).send({userName: user.userName,
-        email: user.email})
+        const user = await req.user.populate('friends').execPopulate();
+        res.status(200).send({user, friends: user.friends})
     }catch(e){
         res.status(503).send({errorMsg: e.message})
     }
@@ -39,5 +35,25 @@ router.post('/user/login',async(req,res) => {
     }
 
 })
+
+router.post('/user/logout',auth, async(req,res) => {
+    try{
+        req.user.tokens = req.user.tokens.filter((token) => token.token!==req.token)
+        await req.user.save()
+        res.status(200).send()
+    }catch(e){
+        res.status(500).send({errorMsg: e.message})
+    }
+})
+
+router.delete('/user/:me', auth, async(req, res) => {
+    try{
+        const user = req.user
+        user.remove()
+        res.status(200).send()
+    }catch(e){
+        res.status(500).send({errorMsg: e.message})
+    }
+} )
 
 module.exports = router

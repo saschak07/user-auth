@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const Friend = require('./friend')
 
 
 const userSchema = new mongoose.Schema({
@@ -36,11 +37,30 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+userSchema.virtual('friends',{
+    ref: 'friend',
+    localField: '_id',
+    foreignField: 'source'
+})
+
+userSchema.methods.toJSON = function(){
+    const user = this
+    const userObject = user.toObject()
+    delete userObject.passwd
+    delete userObject.tokens
+    return userObject
+}
+
 userSchema.pre('save', async function(){
     const user = this
     if(user.isModified('passwd')){
     user.passwd =  await bcrypt.hash(user.passwd,8)
     }
+})
+
+userSchema.pre('remove', async function(){
+    const user = this
+    await Friend.deleteMany({source: user._id})
 })
 
 userSchema.statics.findUserByCreds = async (userName,passwd) => {
