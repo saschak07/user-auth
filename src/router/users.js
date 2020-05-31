@@ -6,7 +6,13 @@ const router = new express.Router()
 
 router.get('/user/me',auth,async (req,res) => {
     try{
-        const user = await req.user.populate('friends').execPopulate();
+        const user = await req.user.populate({
+            path:'friends',
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip)
+            }
+    }).execPopulate();
         res.status(200).send({user, friends: user.friends})
     }catch(e){
         res.status(503).send({errorMsg: e.message})

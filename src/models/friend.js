@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
-
-const friend = mongoose.model('friend',{
+const friendSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -15,7 +14,11 @@ const friend = mongoose.model('friend',{
         required: true,
         ref: 'user'
     }
+},{
+    timestamps: true
 })
+
+const friend = mongoose.model('friend',friendSchema)
 
 module.exports = friend
 
