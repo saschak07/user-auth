@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema({
         minlength: 6,
 
     },
+    photo: {
+        type: Buffer
+    },
     tokens: [{
         token: {
             type: String,
