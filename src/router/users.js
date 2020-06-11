@@ -3,6 +3,7 @@ const User = require('../models/user')
 const auth = require('../middleware/auth')
 const multer = require('multer')
 const sharp = require('sharp')
+//const sendWelcomeMessage = require('../mail/mailer')
 
 const router = new express.Router()
 
@@ -24,10 +25,12 @@ router.get('/user/me',auth,async (req,res) => {
 router.post('/user',async(req,res) => {
     try{
         const user = new User(req.body)
+        //await sendWelcomeMessage(user)
         await user.save()
         const token = await user.generateToken()
         res.status(200).send({userName: user.userName, token})
     }catch(e){
+        console.log(e)
         res.status(503).send({errorMsg: e.message})
     }
 

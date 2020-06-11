@@ -7,7 +7,7 @@ const auth  = async (req, res, next) => {
  if(!token){
      throw new Error('Token required!!')
     }
- const decoded = jwt.verify(token,'hare krishna')
+ const decoded = jwt.verify(token,process.env.JWT_SECRET)
  const user = await User.findOne({userName: decoded._id})
  const savedToken = user.tokens.filter(instance => instance.token===token)
  console.log('logged in user:'+user.userName)

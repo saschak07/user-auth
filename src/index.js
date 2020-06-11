@@ -10,6 +10,6 @@ app.use(userRouter)
 app.use(friendRouter)
 
 
-app.listen(3000,() => {
+app.listen(process.env.PORT,() => {
     console.log('server started at 3000')
 })
